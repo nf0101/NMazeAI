@@ -6,7 +6,7 @@ from mazelib import Maze
 from mazelib.generate.Prims import Prims
 
 from agent import QLearningAgent
-from learning import test_agent
+from learning import test_agent, train_agent
 
 # import matplotlib.pyplot as plt
 
@@ -34,9 +34,10 @@ print(len(m.grid), len(m.grid[0]))
 next_state = m.end
 agent = QLearningAgent(m)
 
+train_agent(agent, m, num_episodes=100000)
 
-result = test_agent(agent, m)
-print(result)
+# test_agent(agent, m)
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -57,6 +58,16 @@ while True:
             pygame.draw.rect(schermo, colore, pygame.Rect(j * dim_cell, i * dim_cell, dim_cell,
                                                           dim_cell))
     pygame.display.flip()
+    # x = -1
+    # while x != 9:
+    #     print("AAA")
+    #     x = int(input())
+    #     if x == 0:
+    #         test_agent(agent, m)
+    #     elif x == 1:
+    #         train_agent(agent, m, num_episodes=1000000)
+    #     elif x == 9:
+    #         sys.exit()
 
 
 
