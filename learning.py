@@ -45,7 +45,7 @@ def finish_episode(agent, maze, current_episode, train=True):
             agent.update_q_table(current_state, action, next_state, reward)
 
         current_state = next_state
-
+    print(episode_step)
     return episode_reward, episode_step, path
 
 
@@ -53,10 +53,10 @@ def test_agent(agent, maze, num_episodes=1):
     print("Start test")
     episode_reward, episode_step, path = finish_episode(agent, maze, num_episodes, train=False)
 
-    print("Learned Path:")
-    for row, col in path:
-        print(f"({row}, {col})-> ", end='')
-    print("Goal!")
+    # print("Learned Path:")
+    # for row, col in path:
+    #     print(f"({row}, {col})-> ", end='')
+    # print("Goal!")
 
     print("Number of steps:", episode_step)
     print("Total reward:", episode_reward)
