@@ -1,4 +1,5 @@
 import sys
+import time
 
 import numpy as np
 import pygame
@@ -7,40 +8,55 @@ from mazelib import Maze
 from mazelib.generate.Prims import Prims
 
 from agent import QLearningAgent
-from learning import test_agent, train_agent, finish_episode
+from learning import test_agent, train_agent
 
 # import matplotlib.pyplot as plt
-# for i in range(1):
-# print(i)
-rows = 15
-cols = 20
-m = Maze()
-m.generator = Prims(rows, cols)
-m.generate()
-m.generate_entrances()
-m.grid[m.start[0]][m.start[1]] = 0
-m.grid[m.end[0]][m.end[1]] = 0
 
-# test
-# Dimensioni di ogni cella (in pixel)
-# dim_cell = 18
-# larghezza, altezza = len(m.grid[0]) * dim_cell, len(m.grid) * dim_cell
-# schermo = pygame.display.set_mode((larghezza, altezza))
-# pygame.display.set_caption("Labirinto Q-Learning")
-# pygame.init()
+media = []
+media_time = []
+for i in range(1):
+    start = time.time()
+    print(i)
+    rows = 21
+    cols = 39
+    m = Maze()
+    m.generator = Prims(rows, cols)
+    m.generate()
+    m.generate_entrances()
+    m.grid[m.start[0]][m.start[1]] = 0
+    m.grid[m.end[0]][m.end[1]] = 0
 
-agent = QLearningAgent(m)
+    # test
+    # Dimensioni di ogni cella (in pixel)
+    dim_cell = 18
+    larghezza, altezza = len(m.grid[0]) * dim_cell, len(m.grid) * dim_cell
+    schermo = pygame.display.set_mode((larghezza, altezza))
+    pygame.display.set_caption("Labirinto Q-Learning")
+    pygame.init()
 
-loaded_arr = np.loadtxt("qtable.txt")
+    agent = QLearningAgent(m)
+    # arr_reshaped = agent.q_table.reshape(agent.q_table.shape[0], -1)
+    # np.savetxt("qtable4.txt", arr_reshaped)
+    # loaded_arr = np.loadtxt("qtable4.txt")
 
-load_original_arr = loaded_arr.reshape(
-    loaded_arr.shape[0], loaded_arr.shape[1] // agent.q_table.shape[2], agent.q_table.shape[2])
+    # load_original_arr = loaded_arr.reshape(
+    #     loaded_arr.shape[0], loaded_arr.shape[1] // agent.q_table.shape[2], agent.q_table.shape[2])
+    # agent.q_table = load_original_arr
 
-agent.q_table = load_original_arr
-train_agent(agent, m, num_episodes=5000)
-# test_agent(agent, m)
-arr_reshaped = agent.q_table.reshape(agent.q_table.shape[0], -1)
-np.savetxt("qtable.txt", arr_reshaped)
+    train_agent(agent, m, num_episodes=200)
+    a = test_agent(agent, m)
+    # arr_reshaped = agent.q_table.reshape(agent.q_table.shape[0], -1)
+    # np.savetxt("qtable4.txt", arr_reshaped)
+    # a = test_agent(agent, m)
+    media.append(a[0])
+    end = time.time()
+    print(f"Elapsed time: {end - start}")
+    media_time.append(end - start)
+print(f"Average time: {sum(media_time)/len(media_time)}")
+#
+average_steps = sum(media) / len(media)
+print(f"Media: {average_steps}")
+
 #
 # # saving reshaped array to file.
 
@@ -63,36 +79,31 @@ np.savetxt("qtable.txt", arr_reshaped)
 
 # print(test_agent(agent, m))
 
-# while True:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             pygame.quit()
-#             sys.exit()
-#     schermo.fill((255, 255, 255))
-#     for i in range(len(m.grid)):
-#         for j in range(len(m.grid[0])):
-#             spessore = dim_cell
-#             colore = (255, 255, 255)  # Bianco per le celle vuote
-#
-#             if (i, j) == m.start:
-#                     colore = (0, 255, 0)
-#             elif (i, j) == m.end:
-#                     colore = (255, 0, 0)
-#             elif m.grid[i][j] == 1:
-#                 colore = (0, 0, 0)  # Nero per i muri
-#             pygame.draw.rect(schermo, colore, pygame.Rect(j * dim_cell, i * dim_cell, dim_cell,
-#                                                           dim_cell))
-#     pygame.display.flip()
-    # x = -1
-    # while x != 9:
-    #     print("AAA")
-    #     x = int(input())
-    #     if x == 0:
-    #         test_agent(agent, m)
-    #     elif x == 1:
-    #         train_agent(agent, m, num_episodes=1000000)
-    #     elif x == 9:
-    #         sys.exit()
+while True:
+    for pos in a[2]:
+        m.grid[pos[0]][pos[1]] = 3
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+    schermo.fill((255, 255, 255))
+    for i in range(len(m.grid)):
+        for j in range(len(m.grid[0])):
+            spessore = dim_cell
+            colore = (255, 255, 255)  # Bianco per le celle vuote
+
+            if (i, j) == m.start:
+                    colore = (0, 255, 0)
+            elif (i, j) == m.end:
+                    colore = (255, 0, 0)
+            elif m.grid[i][j] == 1:
+                colore = (0, 0, 0)  # Nero per i muri
+            elif m.grid[i][j] == 3:
+                colore = (0, 0, 255)
+            pygame.draw.rect(schermo, colore, pygame.Rect(j * dim_cell, i * dim_cell, dim_cell,
+                                                          dim_cell))
+    pygame.display.flip()
+
 
 
 
